@@ -25,7 +25,7 @@ public class Tab2Fragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        new FetchAsyncFollowers().execute();
+        new FetchAsyncFollowers().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Nullable
