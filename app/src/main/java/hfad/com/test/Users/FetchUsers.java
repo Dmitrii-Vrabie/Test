@@ -1,4 +1,4 @@
-package hfad.com.test;
+package hfad.com.test.Users;
 
 import android.net.Uri;
 import android.util.Log;
@@ -19,7 +19,7 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-class FetchItems {
+class FetchUsers {
     private Realm mRealm = Realm.getDefaultInstance();
     public static final String FETCH_MODE = "followers";
     private final String TAG = getClass().getSimpleName();
@@ -49,7 +49,7 @@ class FetchItems {
                 mRealm.beginTransaction();
 
                 for (int i = 0; i < users.length(); i++) {
-                    Users mRealmObject = mRealm.createObject(Users.class);
+                    User mRealmObject = mRealm.createObject(User.class);
 
                     JSONObject user = users.getJSONObject(i);
 
@@ -82,12 +82,12 @@ class FetchItems {
         return builder.toString();
     }
 
-    RealmResults<Users> donwloadAllPages() {
+    RealmResults<User> donwloadAllPages() {
         for (int i = 1; i < 20; i++) {
             getData(String.valueOf(i));
         }
-        RealmQuery<Users> query = mRealm.where(Users.class);
-        final RealmResults<Users> results = query.findAll();
+        RealmQuery<User> query = mRealm.where(User.class);
+        final RealmResults<User> results = query.findAll();
         Log.d(TAG, "donwloadAllPages: " + String.valueOf(results.size()));
         results.sort("likes", Sort.DESCENDING);
         return results;

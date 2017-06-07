@@ -2,8 +2,8 @@
     <string name="app_name">Test</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="tab1text">hello from 1st fragment</string>
-    <string name="tab2text">Hellow from tab2</string>
-    <string name="request">Request</string>
+    <string name="show">Show users</string>
     <string name="common">Common names:</string>
+    <string name="btn_tab2_compare">Matched names</string>
+
 </resources>

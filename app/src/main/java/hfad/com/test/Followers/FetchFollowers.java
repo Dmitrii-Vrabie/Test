@@ -1,4 +1,4 @@
-package hfad.com.test;
+package hfad.com.test.Followers;
 
 import android.net.Uri;
 import android.util.Log;
@@ -19,11 +19,11 @@ import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 
-class FetchFollowers {
+public class FetchFollowers {
     private final String TAG = getClass().getSimpleName();
     private Realm mRealm = Realm.getDefaultInstance();
     private HttpURLConnection mConnection;
-    private RealmResults<Followers> mResults;
+    private RealmResults<Follower> mResults;
     private boolean mDone = false;
 
     private void getData() {
@@ -49,7 +49,7 @@ class FetchFollowers {
                 mRealm.beginTransaction();
 
                 for (int i = 0; i < users.length(); i++) {
-                    Followers mRealmObject = mRealm.createObject(Followers.class);
+                    Follower mRealmObject = mRealm.createObject(Follower.class);
                     JSONObject user = users.getJSONObject(i);
 
                     mRealmObject.setId(user.getString("id"));
@@ -58,7 +58,7 @@ class FetchFollowers {
 
                 }
                 mRealm.commitTransaction();
-                RealmQuery<Followers> query = mRealm.where(Followers.class);
+                RealmQuery<Follower> query = mRealm.where(Follower.class);
                 mResults = query.findAll();
                 mDone = true;
 
@@ -87,15 +87,16 @@ class FetchFollowers {
         return builder.toString();
     }
 
-    RealmResults<Followers> getFollowers() {
+    public void getFollowers() {
         do {
             getData();
         } while (!mDone);
-        RealmQuery<Followers> query = mRealm.where(Followers.class);
-        final RealmResults<Followers> results = query.findAll();
-        Log.d(TAG, "donwloadAllPages: " + String.valueOf(results.size()));
+        RealmQuery<Follower> query = mRealm.where(Follower.class);
+        RealmResults<Follower> results = query.findAll();
+        String ff = "fetchFollowers";
+        Log.d(ff, "donwloadAllPages: " + String.valueOf(results.size()));
         mDone = false;
-        return results;
+
     }
 }
 

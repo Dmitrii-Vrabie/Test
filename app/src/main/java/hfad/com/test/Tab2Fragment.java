@@ -1,5 +1,6 @@
 package hfad.com.test;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -11,47 +12,54 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import hfad.com.test.Followers.FetchFollowers;
+import hfad.com.test.Followers.Follower;
+import hfad.com.test.Users.User;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class Tab2Fragment extends Fragment {
+    private Realm mRealm;
+    private String TAG = getClass().getSimpleName();
     private RecyclerView mRecyclerView;
-    private Button mButton;
+    private ProgressDialog mProgressDialog;
+    private Button mRequestButton;
+    private List<String> mCommonNames = new ArrayList<>();
+    private List<String> mFollowersNames = new ArrayList<>();
+    private List<String> mUsersNames = new ArrayList<>();
+
 
     @Override
-    public void onStart() {
-        super.onStart();
-        new FetchAsyncFollowers().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tab2_fragment, container, false);
+        mProgressDialog = new ProgressDialog(getContext());
         mRecyclerView = (RecyclerView) view.findViewById(R.id.tab2_rview);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mButton = (Button) view.findViewById(R.id.btn_tab2_common);
-        mButton.setOnClickListener(new View.OnClickListener() {
+
+
+        mRequestButton = (Button) view.findViewById(R.id.btn_tab2_make_request);
+        mRequestButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mRecyclerView.setAdapter(new CommonItemsAdapter(compareData()));
+                new FetchAsyncFollowers().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
         return view;
     }
 
-    private RealmResults<Followers> compareData() {
-        Realm realm  = Realm.getDefaultInstance();
 
-
-        return realm.where(Followers.class).findAll();
-    }
-
-    private class CommonItemsHolder extends RecyclerView.ViewHolder {
+    class CommonItemsHolder extends RecyclerView.ViewHolder {
         private TextView mCommonTV;
 
         CommonItemsHolder(View itemView) {
@@ -61,9 +69,9 @@ public class Tab2Fragment extends Fragment {
     }
 
     private class CommonItemsAdapter extends RecyclerView.Adapter<CommonItemsHolder> {
-        private RealmResults<Followers> mCommonsAdapter;
+        private List<String> mCommonsAdapter;
 
-        CommonItemsAdapter(RealmResults<Followers> commonsAdapter) {
+        CommonItemsAdapter(List<String> commonsAdapter) {
             mCommonsAdapter = commonsAdapter;
         }
 
@@ -85,11 +93,52 @@ public class Tab2Fragment extends Fragment {
         }
     }
 
-    private class FetchAsyncFollowers extends AsyncTask<Void, Void, RealmResults<Followers>> {
+    private class FetchAsyncFollowers extends AsyncTask<Void, Void, Void> {
 
         @Override
-        protected RealmResults<Followers> doInBackground(Void... params) {
-            return new FetchFollowers().getFollowers();
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.setMessage("Fetching followers...");
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            FetchFollowers ff = new FetchFollowers();
+            ff.getFollowers();
+            fetchNames();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (mProgressDialog.isShowing()) mProgressDialog.dismiss();
+            mRecyclerView.setAdapter(new CommonItemsAdapter(mCommonNames));
+            mRecyclerView.getAdapter().notifyDataSetChanged();
         }
     }
+
+    private void fetchNames() {
+
+        mRealm = Realm.getDefaultInstance();
+
+        RealmResults<User> query = mRealm.where(User.class).findAll();
+        RealmResults<Follower> followerQuery = mRealm.where(Follower.class).findAll();
+
+
+        for (User user : query) {
+            String userName = user.getName();
+            mUsersNames.add(userName);
+        }
+        mCommonNames = new ArrayList<>(mUsersNames);
+        for (Follower follower : followerQuery) {
+            String followerName = follower.getName();
+            mFollowersNames.add(followerName);
+        }
+
+        mCommonNames.retainAll(mFollowersNames);
+    }
+
 }

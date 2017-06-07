@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical">
 
     <Button
-        android:id="@+id/btn_tab2_common"
+        android:id="@+id/btn_tab2_make_request"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="@string/btn_tab2_compare"
+        tools:ignore="ButtonStyle"/>
+
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/common"
+        android:textStyle="bold"
         android:textSize="15sp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/tab2_rview"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="wrap_content"/>
 </LinearLayout>
